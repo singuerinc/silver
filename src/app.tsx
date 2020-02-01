@@ -1,33 +1,19 @@
 import { useMachine } from "@xstate/react";
 import * as React from "react";
-import { JsonArray } from "type-fest";
-import { assign, Machine } from "xstate";
+import { useReducer } from "react";
+import { Machine } from "xstate";
+import { Bullets } from "./bullets";
+import { IBullet } from "./IBullet";
 import { Intro } from "./intro";
 import { Loading } from "./loading";
-import { Bullets } from "./bullets";
 
-interface StateSchema {
-  states: {
-    welcome: {};
-    loading: {};
-    failure: {};
-    default: {};
-  };
-}
+type IBulletAction =
+  | { type: "UPDATE_ALL"; payload: IBullet[] }
+  | { type: "UPDATE_ONE"; payload: IBullet };
 
-type ViewEvent =
-  | { type: "FETCH" }
-  | { type: "RESOLVE"; bullets: JsonArray }
-  | { type: "ERROR" };
-
-const context = {
-  bullets: []
-};
-
-const views = Machine<typeof context, StateSchema, ViewEvent>({
+const viewsMachine = Machine({
   id: "views",
   initial: "welcome",
-  context,
   states: {
     welcome: {
       on: { FETCH: "loading" },
@@ -35,12 +21,7 @@ const views = Machine<typeof context, StateSchema, ViewEvent>({
     },
     loading: {
       on: {
-        RESOLVE: {
-          target: "default",
-          actions: assign({
-            bullets: (_, event) => event.bullets
-          })
-        },
+        RESOLVE: "default",
         ERROR: "failure"
       },
       entry: ["load"]
@@ -50,24 +31,42 @@ const views = Machine<typeof context, StateSchema, ViewEvent>({
   }
 });
 
+const equal = (i1, i2) => i1 === i2;
+
+const reducer = (state: IBullet[], action: IBulletAction) => {
+  switch (action.type) {
+    case "UPDATE_ALL":
+      return action.payload;
+    case "UPDATE_ONE":
+      return state.map(item =>
+        equal(item.id, action.payload.id) ? action.payload : item
+      );
+    default:
+      return state;
+  }
+};
+
 export const App = () => {
-  const [current, send] = useMachine(views, {
+  const [state, dispatch] = useReducer<IBullet[]>(reducer, []);
+  const [current, send] = useMachine(viewsMachine, {
     actions: {
       welcome: () => {
-        setTimeout(() => send({ type: "FETCH" }), 1000);
+        setTimeout(() => send({ type: "FETCH" }), 100);
       },
       load: () => {
         fetch("./bullets.json").then(res => {
-          console.log(res);
-
           res.json().then(json => {
-            console.log(json);
-            setTimeout(() => send({ type: "RESOLVE", bullets: json }), 1000);
+            dispatch({ type: "UPDATE_ALL", payload: json });
+            setTimeout(() => send({ type: "RESOLVE" }), 100);
           });
         });
       }
     }
   });
+
+  function onUpdate(bullet) {
+    dispatch({ type: "UPDATE_ONE", payload: bullet });
+  }
 
   switch (current.value) {
     case "welcome":
@@ -75,7 +74,7 @@ export const App = () => {
     case "loading":
       return <Loading />;
     case "default":
-      return <Bullets data={current.context.bullets} />;
+      return <Bullets data={state} onUpdate={onUpdate} />;
     default:
       return null;
   }
