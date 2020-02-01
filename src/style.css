@@ -16,7 +16,8 @@ body {
 #app {
   margin: 2em 0;
   padding: 1em;
-  height: 100%;
   border: 1px solid #ccc;
-  width: 32em;
+  flex: 1 1;
+  width: 100%;
+  max-width: 32em;
 }
