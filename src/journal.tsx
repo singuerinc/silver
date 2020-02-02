@@ -22,14 +22,14 @@ export function View({ className, data, onUpdate }: IProps) {
     );
   };
 
-  const byDate = data.reduce((acc, currentValue, currentIndex, arr) => {
-    const date = parseISO(currentValue.date);
+  const groupedByDate = data.reduce((acc, current) => {
+    const date = parseISO(current.date);
     const dayOfYear = getDayOfYear(date);
     if (!acc.has(dayOfYear)) {
-      acc.set(dayOfYear, [currentValue]);
+      acc.set(dayOfYear, [current]);
     } else {
       const modified = produce(acc.get(dayOfYear), draft => {
-        draft.push(currentValue);
+        draft.push(current);
       });
       acc.set(dayOfYear, modified);
     }
@@ -38,7 +38,7 @@ export function View({ className, data, onUpdate }: IProps) {
 
   return (
     <ul className={className}>
-      {Array.from(byDate).map(([key, value], idx1) => (
+      {Array.from(groupedByDate).map(([key, value], idx1) => (
         <li key={idx1}>
           <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
           <ul>

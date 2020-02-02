@@ -2,6 +2,8 @@ import compareDesc from "date-fns/compareDesc";
 import parseISO from "date-fns/parseISO";
 import { assign, Machine } from "xstate";
 import { IBullet } from "./IBullet";
+import produce from "immer";
+import uuidv4 from "uuid/v4";
 
 interface JournalContext {
   journal: IBullet[];
@@ -14,6 +16,22 @@ export type JournalEvent =
   | { type: "UPDATE_ONE"; payload: IBullet }
   | { type: "ERROR"; payload? };
 
+const one = (title: string): IBullet => ({
+  id: uuidv4(),
+  title,
+  date: new Date().toISOString(),
+  state: 0
+});
+
+const getJournal = () =>
+  Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
+
+const setJournal = ctx =>
+  Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
+
+const byDate = (a: IBullet, b: IBullet) =>
+  compareDesc(parseISO(a.date), parseISO(b.date));
+
 export const machine = Machine<JournalContext, any, JournalEvent>({
   strict: true,
   context: {
@@ -22,19 +40,13 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
   initial: "welcome",
   states: {
     welcome: {
-      on: { FETCH: "loading" },
-      entry: ["onWelcome"]
+      after: {
+        1000: "loading"
+      }
     },
     loading: {
       invoke: {
-        src: () => {
-          const journal: IBullet[] =
-            JSON.parse(localStorage.getItem("journal")) || [];
-          const orderByDate = journal.sort((a, b) =>
-            compareDesc(parseISO(a.date), parseISO(b.date))
-          );
-          return Promise.resolve(orderByDate);
-        },
+        src: () => getJournal().then(res => res.sort(byDate)),
         onDone: {
           target: "journal",
           actions: assign({ journal: (_, event) => event.data })
@@ -52,23 +64,27 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
           }
         },
         add: {
-          entry: ["addOne"],
+          entry: [
+            assign({
+              journal: (context, event) =>
+                produce(context.journal, draft => {
+                  draft.unshift(one(event.payload));
+                })
+            })
+          ],
           on: {
             "": "save"
           }
         },
         update: {
-          entry: ["updateOne"],
+          entry: ["update"],
           on: {
             "": "save"
           }
         },
         save: {
           invoke: {
-            src: ctx => {
-              localStorage.setItem("journal", JSON.stringify(ctx.journal));
-              return Promise.resolve();
-            },
+            src: setJournal,
             onDone: {
               target: "default"
             }
@@ -78,7 +94,3 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
     }
   }
 });
-
-// assign(() => ({
-//   journal: JSON.parse(localStorage.getItem("journal")) || []
-// })),

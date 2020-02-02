@@ -17,24 +17,11 @@ export const App = () => {
   const [current, send] = useMachine(machine, {
     devTools: true,
     actions: {
-      onWelcome: () => {
-        setTimeout(() => send({ type: "FETCH" }), 200);
-      },
-      updateOne: assign((context, event) => ({
+      update: assign((context, event) => ({
         journal: context.journal.map(item =>
           equal(item.id, event.payload.id) ? event.payload : item
         )
-      })),
-      addOne: assign((context, event) =>
-        produce(context, draft => {
-          draft.journal.unshift({
-            id: uuid.v4(),
-            title: event.payload,
-            date: new Date().toISOString(),
-            state: 0
-          });
-        })
-      )
+      }))
     }
   });
 

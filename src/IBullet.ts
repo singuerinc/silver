@@ -1,6 +1,6 @@
 export interface IBullet {
-  id: string;
-  title: string;
-  state: number;
-  date: string;
+  readonly id: string;
+  readonly title: string;
+  readonly state: number;
+  readonly date: string;
 }
