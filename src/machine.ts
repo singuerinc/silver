@@ -24,15 +24,15 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
       entry: ["onWelcome"]
     },
     loading: {
-      entry: ["load"],
-      on: {
-        RESOLVE: {
-          target: "journal",
-          actions: assign({
-            journal: (_, event) => event.payload
-          })
+      invoke: {
+        src: () => {
+          const journal = JSON.parse(localStorage.getItem("journal")) || [];
+          return Promise.resolve(journal);
         },
-        ERROR: "failure"
+        onDone: {
+          target: "journal",
+          actions: assign({ journal: (_, event) => event.data })
+        }
       }
     },
     failure: {},
@@ -61,9 +61,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
           invoke: {
             src: ctx => {
               localStorage.setItem("journal", JSON.stringify(ctx.journal));
-              return new Promise(resolve => {
-                setTimeout(resolve, 200);
-              });
+              return Promise.resolve();
             },
             onDone: {
               target: "default"
@@ -74,3 +72,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
     }
   }
 });
+
+// assign(() => ({
+//   journal: JSON.parse(localStorage.getItem("journal")) || []
+// })),

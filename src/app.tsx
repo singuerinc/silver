@@ -21,10 +21,6 @@ export const App = () => {
       onWelcome: () => {
         setTimeout(() => send({ type: "FETCH" }), 200);
       },
-      load: () => {
-        const payload = JSON.parse(localStorage.getItem("journal")) || [];
-        send({ type: "RESOLVE", payload });
-      },
       updateOne: assign((context, event) => ({
         journal: context.journal.map(item =>
           equal(item.id, event.payload.id) ? event.payload : item
