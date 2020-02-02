@@ -91,7 +91,8 @@ export const Journal = styled(View)`
           > a[data-hook="tag"] {
             color: blue;
           }
-          > a[data-hook="link"] {
+          > a[data-hook="link"],
+          > a[data-hook="jira"] {
             color: green;
           }
         }
