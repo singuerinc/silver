@@ -9,9 +9,7 @@ body {
   display: flex;
   flex-flow: column;
   align-items: center;
-  /* font-family: "Caveat", cursive; */
-  font-family: "Patrick Hand", cursive;
-  /* font-family: "Covered By Your Grace", cursive; */
+  font-family: "Overpass Mono", monospace;
   background-image: url(./subtle_dots.png);
 }
 

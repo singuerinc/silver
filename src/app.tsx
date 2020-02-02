@@ -3,7 +3,6 @@ import produce from "immer";
 import * as React from "react";
 import uuid from "uuid";
 import { assign } from "xstate";
-import { Add } from "./add";
 import { Failure } from "./failure";
 import { IBullet } from "./IBullet";
 import sync from "./icons/sync-24px.svg";
@@ -26,11 +25,11 @@ export const App = () => {
           equal(item.id, event.payload.id) ? event.payload : item
         )
       })),
-      addOne: assign(context =>
+      addOne: assign((context, event) =>
         produce(context, draft => {
-          draft.journal.push({
+          draft.journal.unshift({
             id: uuid.v4(),
-            title: "Bullet",
+            title: event.payload,
             date: new Date().toISOString(),
             state: 0
           });
@@ -43,8 +42,13 @@ export const App = () => {
     send({ type: "UPDATE_ONE", payload });
   }
 
-  function onAdd() {
-    send({ type: "ADD_ONE" });
+  function onAddKeyDown(e) {
+    if (e.keyCode === 13) {
+      const input = e.target as HTMLInputElement;
+      const payload = input.value;
+      input.value = "";
+      send({ type: "ADD_ONE", payload });
+    }
   }
 
   return (
@@ -53,8 +57,13 @@ export const App = () => {
     (current.matches("failure") && <Failure />) ||
     (current.matches("journal") && (
       <>
-        <Add onAdd={onAdd} />
-        <Journal data={current.context.journal} onUpdate={onUpdate} />
+        <section>
+          <input type="text" onKeyDown={onAddKeyDown} />
+        </section>
+
+        <section>
+          <Journal data={current.context.journal} onUpdate={onUpdate} />
+        </section>
         {current.matches("journal.save") && (
           <i>
             <img src={sync} />

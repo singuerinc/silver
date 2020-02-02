@@ -1,16 +1,18 @@
-import { Machine, assign } from "xstate";
+import compareDesc from "date-fns/compareDesc";
+import parseISO from "date-fns/parseISO";
+import { assign, Machine } from "xstate";
 import { IBullet } from "./IBullet";
 
 interface JournalContext {
   journal: IBullet[];
 }
 
-type JournalEvent =
-  | { type: "FETCH" }
+export type JournalEvent =
+  | { type: "FETCH"; payload? }
   | { type: "RESOLVE"; payload: IBullet[] }
-  | { type: "ADD_ONE" }
+  | { type: "ADD_ONE"; payload: string }
   | { type: "UPDATE_ONE"; payload: IBullet }
-  | { type: "ERROR" };
+  | { type: "ERROR"; payload? };
 
 export const machine = Machine<JournalContext, any, JournalEvent>({
   strict: true,
@@ -26,8 +28,12 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
     loading: {
       invoke: {
         src: () => {
-          const journal = JSON.parse(localStorage.getItem("journal")) || [];
-          return Promise.resolve(journal);
+          const journal: IBullet[] =
+            JSON.parse(localStorage.getItem("journal")) || [];
+          const orderByDate = journal.sort((a, b) =>
+            compareDesc(parseISO(a.date), parseISO(b.date))
+          );
+          return Promise.resolve(orderByDate);
         },
         onDone: {
           target: "journal",
