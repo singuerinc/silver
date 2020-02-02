@@ -9,19 +9,28 @@ body {
   display: flex;
   flex-flow: column;
   align-items: center;
-  font-family: "Overpass Mono", monospace;
-  background-image: url(./subtle_dots.png);
+  font-family: "Caveat", cursive;
 }
 
 #app {
   margin: 2em 0;
   padding: 2em;
-  border: 1px solid #333;
   flex: 1 1;
   width: 100%;
   max-width: 32em;
+  background-image: url(./dot.svg);
+  background-size: 24px;
+  background-position: 23px 23px;
 }
 
 img {
   vertical-align: top;
+}
+
+h1,
+h2,
+h3,
+ul {
+  margin: 0;
+  padding: 0;
 }

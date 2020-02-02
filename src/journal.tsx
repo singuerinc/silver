@@ -61,15 +61,14 @@ export function View({ className, data, onUpdate }: IProps) {
 
 export const Journal = styled(View)`
   list-style: none;
-  margin: 0;
-  padding: 0;
   > li {
     display: flex;
     flex-flow: column;
+    > h2 /* date */ {
+      margin: 1em 0;
+    }
     > ul {
       list-style: none;
-      margin: 0;
-      padding: 0;
       > li {
         display: flex;
         > i {
@@ -81,8 +80,6 @@ export const Journal = styled(View)`
         }
         > h3 {
           user-select: none;
-          margin: 0;
-          padding: 0;
           flex: 1 1;
           font-size: 1em;
         }

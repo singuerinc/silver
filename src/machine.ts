@@ -1,9 +1,9 @@
 import compareDesc from "date-fns/compareDesc";
 import parseISO from "date-fns/parseISO";
-import { assign, Machine } from "xstate";
-import { IBullet } from "./IBullet";
 import produce from "immer";
 import uuidv4 from "uuid/v4";
+import { assign, Machine } from "xstate";
+import { IBullet } from "./IBullet";
 
 interface JournalContext {
   journal: IBullet[];
@@ -22,6 +22,8 @@ const one = (title: string): IBullet => ({
   date: new Date().toISOString(),
   state: 0
 });
+
+const equal = (x, y) => x === y;
 
 const getJournal = () =>
   Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
@@ -77,7 +79,15 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
           }
         },
         update: {
-          entry: ["update"],
+          entry: [
+            assign({
+              journal: ({ journal }, { payload }) =>
+                produce(journal, draft => {
+                  const bullet = draft.find(item => item.id === payload.id);
+                  bullet.state = payload.state;
+                })
+            })
+          ],
           on: {
             "": "save"
           }
