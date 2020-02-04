@@ -6,7 +6,10 @@ import produce from "immer";
 import * as React from "react";
 import styled from "styled-components";
 import { IBullet } from "./IBullet";
-import hooks from "./hook";
+import { jira } from "./hooks/jira";
+import { link } from "./hooks/link";
+import { slack } from "./hooks/slack";
+import { tag } from "./hooks/tag";
 
 interface IProps {
   data: IBullet[];
@@ -15,19 +18,20 @@ interface IProps {
   onEdit(x: IBullet): VoidFunction;
 }
 
-const applyHooks = title => hooks.reduce((acc, hook) => hook(acc), title);
+const applyHooks = title =>
+  [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
 
 export function View({ className, data, onUpdate, onEdit }: IProps) {
   const cycle = (bullet: IBullet) => () => {
-    onUpdate(
-      produce(bullet, draft => {
-        draft.state = (draft.state + 1) % 3;
-      })
-    );
+    const updated = produce(bullet, draft => {
+      draft.state = (draft.state + 1) % 4;
+    });
+    onUpdate(updated);
   };
 
   const onClickOnBullet = (x: IBullet) => () => onEdit(x);
 
+  //TODO: Move somewhere else
   const groupedByDate = data.reduce((acc, current) => {
     const date = parseISO(current.date);
     const dayOfYear = getDayOfYear(date);
@@ -49,17 +53,17 @@ export function View({ className, data, onUpdate, onEdit }: IProps) {
           <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
           <ul>
             {value.map((x, idx2) => (
-              <li
-                key={idx2}
-                className={`s-${x.state}`}
-                onClick={onClickOnBullet(x)}
-              >
+              <li key={idx2} className={`s-${x.state}`}>
                 <i onClick={cycle(x)}>
                   {x.state === 0 && "•"}
                   {x.state === 1 && "x"}
                   {x.state === 2 && ">"}
+                  {x.state === 3 && "-"}
                 </i>
-                <h3 dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }} />
+                <h3
+                  onClick={onClickOnBullet(x)}
+                  dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
+                />
               </li>
             ))}
           </ul>
@@ -76,6 +80,7 @@ export const Journal = styled(View)`
     flex-flow: column;
     > h2 /* date */ {
       margin: 1em 0;
+      user-select: none;
     }
     > ul {
       list-style: none;
@@ -89,10 +94,13 @@ export const Journal = styled(View)`
           font-size: 2em;
           line-height: 0.9em;
           user-select: none;
+          &:hover {
+            opacity: 0.5;
+          }
         }
         > h3 {
           user-select: none;
-          flex: 1 1;
+          flex: 0 0 auto;
           font-size: 1.4em;
           > a[data-hook="user"] {
             color: red;

@@ -13,34 +13,46 @@ interface IProps {
 
 function View({ className, bullet, onCommit, onCancel }: IProps) {
   const ref = useRef(null);
+  const win = useRef(null);
 
   function onKeyDown(e) {
     if (e.keyCode === 13) {
       // enter
       const input = e.target as HTMLInputElement;
-      onCommit(
-        produce(bullet, draft => {
-          draft.title = input.value;
-        })
-      );
+      const updated = produce(bullet, draft => {
+        draft.title = input.value;
+      });
+      onCommit(updated);
     } else if (e.keyCode === 27) {
       // escape
       onCancel();
     }
   }
 
+  const stopPropagation = (e: MouseEvent) => {
+    e.stopPropagation();
+  };
+
   useEffect(() => {
     ref.current.focus();
+    // listen for enter+esc keys
     window.addEventListener("keydown", onKeyDown);
+    // clicks outside this dialog should close it
+    window.addEventListener("click", onCancel);
+    // do not close if we click inside
+    win.current.addEventListener("click", stopPropagation);
+
     return () => {
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("click", onCancel);
+      win.current.removeEventListener("click", stopPropagation);
     };
   }, []);
 
   return (
-    <div className={className}>
+    <div ref={win} className={className}>
       <input ref={ref} type="text" defaultValue={bullet.title} />
-      <footer>Enter: Accept changes / Esc: Cancel and exit</footer>
+      <footer>Enter / Esc</footer>
     </div>
   );
 }
