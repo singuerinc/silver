@@ -12,11 +12,12 @@ interface IProps {
   data: IBullet[];
   className?: string;
   onUpdate(x: IBullet): VoidFunction;
+  onEdit(x: IBullet): VoidFunction;
 }
 
 const applyHooks = title => hooks.reduce((acc, hook) => hook(acc), title);
 
-export function View({ className, data, onUpdate }: IProps) {
+export function View({ className, data, onUpdate, onEdit }: IProps) {
   const cycle = (bullet: IBullet) => () => {
     onUpdate(
       produce(bullet, draft => {
@@ -24,6 +25,8 @@ export function View({ className, data, onUpdate }: IProps) {
       })
     );
   };
+
+  const onClickOnBullet = (x: IBullet) => () => onEdit(x);
 
   const groupedByDate = data.reduce((acc, current) => {
     const date = parseISO(current.date);
@@ -46,7 +49,11 @@ export function View({ className, data, onUpdate }: IProps) {
           <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
           <ul>
             {value.map((x, idx2) => (
-              <li key={idx2} className={`s-${x.state}`}>
+              <li
+                key={idx2}
+                className={`s-${x.state}`}
+                onClick={onClickOnBullet(x)}
+              >
                 <i onClick={cycle(x)}>
                   {x.state === 0 && "•"}
                   {x.state === 1 && "x"}
@@ -77,14 +84,16 @@ export const Journal = styled(View)`
         > i {
           cursor: pointer;
           flex: 0 0 1em;
-          margin-right: 0.2em;
+          margin-right: 0.1em;
           font-weight: bold;
-          font-size: 1.2em;
+          font-size: 2em;
+          line-height: 0.9em;
+          user-select: none;
         }
         > h3 {
           user-select: none;
           flex: 1 1;
-          font-size: 1em;
+          font-size: 1.4em;
           > a[data-hook="user"] {
             color: red;
           }

@@ -6,6 +6,7 @@ import { assign, Machine } from "xstate";
 import { IBullet } from "./IBullet";
 
 interface JournalContext {
+  current: IBullet;
   journal: IBullet[];
 }
 
@@ -13,8 +14,10 @@ export type JournalEvent =
   | { type: "FETCH"; payload? }
   | { type: "RESOLVE"; payload: IBullet[] }
   | { type: "ADD_ONE"; payload: string }
+  | { type: "EDIT_ONE"; payload: IBullet }
   | { type: "UPDATE_ONE"; payload: IBullet }
-  | { type: "ERROR"; payload? };
+  | { type: "ERROR"; payload? }
+  | { type: "CANCEL"; payload? };
 
 const one = (title: string): IBullet => ({
   id: uuidv4(),
@@ -22,8 +25,6 @@ const one = (title: string): IBullet => ({
   date: new Date().toISOString(),
   state: 0
 });
-
-const equal = (x, y) => x === y;
 
 const getJournal = () =>
   Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
@@ -37,13 +38,14 @@ const byDate = (a: IBullet, b: IBullet) =>
 export const machine = Machine<JournalContext, any, JournalEvent>({
   strict: true,
   context: {
+    current: null,
     journal: []
   },
   initial: "welcome",
   states: {
     welcome: {
       after: {
-        1000: "loading"
+        100: "loading"
       }
     },
     loading: {
@@ -62,6 +64,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
         default: {
           on: {
             ADD_ONE: "add",
+            EDIT_ONE: "edit",
             UPDATE_ONE: "update"
           }
         },
@@ -78,13 +81,24 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
             "": "save"
           }
         },
+        edit: {
+          entry: [
+            assign({
+              current: (_, event) => event.payload
+            })
+          ],
+          on: {
+            CANCEL: "default",
+            UPDATE_ONE: "update"
+          }
+        },
         update: {
           entry: [
             assign({
               journal: ({ journal }, { payload }) =>
                 produce(journal, draft => {
-                  const bullet = draft.find(item => item.id === payload.id);
-                  bullet.state = payload.state;
+                  const idx = draft.findIndex(item => item.id === payload.id);
+                  draft[idx] = payload;
                 })
             })
           ],

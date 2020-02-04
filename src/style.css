@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 html,
 body {
   margin: 0;
@@ -17,10 +21,11 @@ body {
   padding: 2em;
   flex: 1 1;
   width: 100%;
-  max-width: 32em;
+  max-width: 32.6em;
   background-image: url(./dot.svg);
   background-size: 24px;
-  background-position: 23px 23px;
+  border: 2em solid white;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
 }
 
 img {

@@ -1,8 +1,6 @@
 import { useMachine } from "@xstate/react";
-import produce from "immer";
 import * as React from "react";
-import uuid from "uuid";
-import { assign } from "xstate";
+import { EditBullet } from "./edit-dialog";
 import { Failure } from "./failure";
 import { IBullet } from "./IBullet";
 import sync from "./icons/sync-24px.svg";
@@ -16,6 +14,10 @@ export const App = () => {
 
   function onUpdate(payload: IBullet) {
     send({ type: "UPDATE_ONE", payload });
+  }
+
+  function onEdit(payload: IBullet) {
+    send({ type: "EDIT_ONE", payload });
   }
 
   function onAddKeyDown(e) {
@@ -32,12 +34,27 @@ export const App = () => {
     (current.matches("failure") && <Failure />) ||
     (current.matches("journal") && (
       <>
+        {current.matches("journal.edit") && (
+          <div>
+            <EditBullet
+              bullet={current.context.current}
+              onCancel={() => send("CANCEL")}
+              onCommit={(payload: IBullet) =>
+                send({ type: "UPDATE_ONE", payload })
+              }
+            />
+          </div>
+        )}
         <section>
           <input type="text" onKeyDown={onAddKeyDown} />
         </section>
 
         <section>
-          <Journal data={current.context.journal} onUpdate={onUpdate} />
+          <Journal
+            data={current.context.journal}
+            onEdit={onEdit}
+            onUpdate={onUpdate}
+          />
         </section>
         {current.matches("journal.save") && (
           <i>
