@@ -12,20 +12,16 @@ interface JournalContext {
 export type JournalEvent =
   | { type: "FETCH"; payload? }
   | { type: "RESOLVE"; payload: IBullet[] }
-  | { type: "ADD_ONE"; payload: IBullet }
+  | { type: "ADD"; payload? }
   | { type: "EDIT_ONE"; payload: IBullet }
   | { type: "UPDATE_ONE"; payload: IBullet }
   | { type: "ERROR"; payload? }
+  | { type: "SAVE_ONE"; payload? }
   | { type: "CANCEL"; payload? };
 
-const getJournal = () =>
-  Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
-
-const setJournal = ctx =>
-  Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
-
-const byDate = (a: IBullet, b: IBullet) =>
-  compareDesc(parseISO(a.date), parseISO(b.date));
+const getJournal = () => Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
+const setJournal = ctx => Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
+const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
 
 export const machine = Machine<JournalContext, any, JournalEvent>({
   strict: true,
@@ -55,22 +51,25 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
       states: {
         default: {
           on: {
-            ADD_ONE: "add",
+            ADD: "add",
             EDIT_ONE: "edit",
-            UPDATE_ONE: "update"
+            UPDATE_ONE: "update" /* state update */
           }
         },
         add: {
-          entry: [
-            assign({
-              journal: (context, event) =>
-                produce(context.journal, draft => {
-                  draft.unshift(event.payload);
-                })
-            })
-          ],
           on: {
-            "": "save"
+            CANCEL: "default",
+            SAVE_ONE: {
+              actions: [
+                assign({
+                  journal: (context, event) =>
+                    produce(context.journal, draft => {
+                      draft.unshift(event.payload);
+                    })
+                })
+              ],
+              target: "save"
+            }
           }
         },
         edit: {
@@ -81,7 +80,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
           ],
           on: {
             CANCEL: "default",
-            UPDATE_ONE: "update"
+            UPDATE_ONE: "update" /* title update */
           }
         },
         update: {

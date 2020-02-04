@@ -7,6 +7,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100%;
+  background-color: rgb(240, 240, 240);
 }
 
 body {
@@ -25,6 +26,7 @@ body {
   background-image: url(./dot.svg);
   background-size: 24px;
   border: 2em solid white;
+  background-color: white;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
 }
 

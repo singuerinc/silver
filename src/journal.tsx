@@ -18,8 +18,7 @@ interface IProps {
   onEdit(x: IBullet): VoidFunction;
 }
 
-const applyHooks = title =>
-  [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
+const applyHooks = title => [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
 
 export function View({ className, data, onUpdate, onEdit }: IProps) {
   const cycle = (bullet: IBullet) => () => {
@@ -60,10 +59,7 @@ export function View({ className, data, onUpdate, onEdit }: IProps) {
                   {x.state === 2 && ">"}
                   {x.state === 3 && "-"}
                 </i>
-                <h3
-                  onClick={onClickOnBullet(x)}
-                  dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
-                />
+                <h3 onClick={onClickOnBullet(x)} dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }} />
               </li>
             ))}
           </ul>
@@ -79,7 +75,7 @@ export const Journal = styled(View)`
     display: flex;
     flex-flow: column;
     > h2 /* date */ {
-      margin: 1em 0;
+      margin: 0 0 1em 0;
       user-select: none;
     }
     > ul {

@@ -1,7 +1,7 @@
 import * as React from "react";
-import { useRef, useEffect } from "react";
-import uuidv4 from "uuid/v4";
+import { useEffect, useRef } from "react";
 import styled from "styled-components";
+import uuidv4 from "uuid/v4";
 import { IBullet } from "./IBullet";
 
 interface IProps {
@@ -25,7 +25,7 @@ const getStateAndTitle = (original: string) => {
   return { state, title };
 };
 
-function View({ className, onCommit }: IProps) {
+function View({ className, onCommit, onCancel }: IProps) {
   const ref = useRef(null);
 
   function onKeyDown(e) {
@@ -44,8 +44,7 @@ function View({ className, onCommit }: IProps) {
       onCommit(bullet);
     } else if (e.keyCode === 27) {
       // escape
-      ref.current.focus();
-      ref.current.value = "";
+      onCancel();
     }
   }
 
@@ -69,6 +68,7 @@ function View({ className, onCommit }: IProps) {
 export const AddBullet = styled(View)`
   display: flex;
   background-color: red;
+  margin-bottom: 1em;
   > input {
     width: 100%;
     padding: 0.2em;
