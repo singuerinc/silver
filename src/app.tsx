@@ -8,6 +8,7 @@ import { Journal } from "./journal";
 import { Loading } from "./loading";
 import { machine } from "./machine";
 import { Welcome } from "./welcome";
+import { AddBullet } from "./add-bullet";
 
 export const App = () => {
   const [current, send] = useMachine(machine);
@@ -20,14 +21,6 @@ export const App = () => {
     send({ type: "EDIT_ONE", payload });
   }
 
-  function onAddKeyDown(e) {
-    if (e.keyCode === 13) {
-      const input = e.target as HTMLInputElement;
-      send({ type: "ADD_ONE", payload: input.value });
-      input.value = "";
-    }
-  }
-
   return (
     (current.matches("welcome") && <Welcome />) ||
     (current.matches("loading") && <Loading />) ||
@@ -35,20 +28,17 @@ export const App = () => {
     (current.matches("journal") && (
       <>
         {current.matches("journal.edit") && (
-          <div>
-            <EditBullet
-              bullet={current.context.current}
-              onCancel={() => send("CANCEL")}
-              onCommit={(payload: IBullet) =>
-                send({ type: "UPDATE_ONE", payload })
-              }
-            />
-          </div>
+          <EditBullet
+            bullet={current.context.current}
+            onCancel={() => send("CANCEL")}
+            onCommit={(payload: IBullet) =>
+              send({ type: "UPDATE_ONE", payload })
+            }
+          />
         )}
-        <section>
-          <input type="text" onKeyDown={onAddKeyDown} />
-        </section>
-
+        <AddBullet
+          onCommit={(payload: IBullet) => send({ type: "ADD_ONE", payload })}
+        />
         <section>
           <Journal
             data={current.context.journal}
