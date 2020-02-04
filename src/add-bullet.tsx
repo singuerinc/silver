@@ -7,6 +7,7 @@ import { IBullet } from "./IBullet";
 interface IProps {
   className?: string;
   onCommit: (bullet: IBullet) => void;
+  onCancel: VoidFunction;
 }
 
 const states = {
@@ -28,7 +29,9 @@ const getStateAndTitle = (original: string) => {
 function View({ className, onCommit, onCancel }: IProps) {
   const ref = useRef(null);
 
-  function onKeyDown(e) {
+  function onKeyDown(e: KeyboardEvent) {
+    e.stopImmediatePropagation();
+
     if (e.keyCode === 13) {
       const { title, state } = getStateAndTitle(ref.current.value);
       // enter
@@ -51,10 +54,10 @@ function View({ className, onCommit, onCancel }: IProps) {
   useEffect(() => {
     ref.current.focus();
     // listen for enter+esc keys
-    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keydown", onKeyDown, true);
 
     return () => {
-      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keydown", onKeyDown, true);
     };
   }, []);
 

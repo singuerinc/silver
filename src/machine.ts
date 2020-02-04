@@ -88,6 +88,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>({
             assign({
               journal: ({ journal }, { payload }) =>
                 produce(journal, draft => {
+                  //TODO!: delete bullet if no title!
                   const idx = draft.findIndex(item => item.id === payload.id);
                   draft[idx] = payload;
                 })

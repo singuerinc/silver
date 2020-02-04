@@ -25,7 +25,7 @@ function View({ className }) {
   const onClickOnAddButton = () => send("ADD");
 
   function onKeyDown(e) {
-    if (e.code === "KeyN" && e.ctrlKey) {
+    if (e.code === "Period") {
       send("ADD");
     }
   }

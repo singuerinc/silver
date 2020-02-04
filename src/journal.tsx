@@ -75,11 +75,12 @@ export const Journal = styled(View)`
     display: flex;
     flex-flow: column;
     > h2 /* date */ {
-      margin: 0 0 1em 0;
+      margin: 0 0 0.5em 0;
       user-select: none;
+      font-size: 2.1em;
     }
     > ul {
-      list-style: none;
+      margin-bottom: 2em;
       > li {
         display: flex;
         > i {

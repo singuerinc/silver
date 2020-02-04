@@ -62,7 +62,7 @@ export const EditBullet = styled(View)`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 46em;
+  width: 42em;
   display: flex;
   flex-flow: column;
   justify-content: center;
@@ -73,7 +73,7 @@ export const EditBullet = styled(View)`
   > input {
     text-align: center;
     width: 100%;
-    padding: 0.9em;
+    padding: 0.7em 0.9em 0.1em;
     font-size: 2.6em;
     border: none;
     font-family: inherit;
