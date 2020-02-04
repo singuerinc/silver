@@ -1,7 +1,6 @@
 {
   "name": "silver",
   "version": "1.0.0",
-  "main": "index.js",
   "author": "singuerinc <nahuel.scotti@gmail.com>",
   "license": "MIT",
   "scripts": {
