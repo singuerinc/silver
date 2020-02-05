@@ -7,6 +7,7 @@ import { IBullet } from "./IBullet";
 interface JournalContext {
   current: IBullet;
   journal: IBullet[];
+  page: number;
 }
 
 export type JournalEvent =
@@ -17,6 +18,7 @@ export type JournalEvent =
   | { type: "DELETE_ONE"; payload: IBullet }
   | { type: "UPDATE_ONE"; payload: IBullet }
   | { type: "ERROR"; payload? }
+  | { type: "CHANGE_PAGE"; payload: number }
   | { type: "SAVE_ONE"; payload? }
   | { type: "CANCEL"; payload? };
 
@@ -54,17 +56,18 @@ const deleteOne = assign({
     })
 });
 
-const setCurrent = assign({
+const assignPage = assign({ page: (_, event) => event.payload });
+const assignJournal = assign({ journal: (_, event) => event.data });
+const assignCurrent = assign({
   current: (_, event: JournalEvent) => event.payload
 });
-
-const assignJournal = assign({ journal: (_, event) => event.data });
 
 export const machine = Machine<JournalContext, any, JournalEvent>(
   {
     strict: true,
     context: {
       current: null,
+      page: 0,
       journal: []
     },
     initial: "welcome",
@@ -92,7 +95,14 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
               ADD: "add",
               EDIT_ONE: "edit",
               UPDATE_ONE: "update" /* state update */,
-              DELETE_ONE: "delete"
+              DELETE_ONE: "delete",
+              CHANGE_PAGE: "changePage"
+            }
+          },
+          changePage: {
+            entry: ["assignPage"],
+            on: {
+              "": "default"
             }
           },
           add: {
@@ -137,7 +147,8 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
   },
   {
     actions: {
-      setCurrent,
+      assignPage,
+      assignCurrent,
       saveOne,
       deleteOne,
       updateOne,

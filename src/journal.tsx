@@ -10,17 +10,20 @@ import { jira } from "./hooks/jira";
 import { link } from "./hooks/link";
 import { slack } from "./hooks/slack";
 import { tag } from "./hooks/tag";
+import { PrevPageButton, NextPageButton } from "./ui/page-btn";
 
 interface IProps {
   data: IBullet[];
+  page: number;
   className?: string;
   onUpdate(x: IBullet): VoidFunction;
+  onChangePage(page: number): VoidFunction;
   onEdit(x: IBullet): VoidFunction;
 }
 
 const applyHooks = title => [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
 
-export function View({ className, data, onUpdate, onEdit }: IProps) {
+export function View({ className, data, page, onChangePage, onUpdate, onEdit }: IProps) {
   const cycle = (bullet: IBullet) => () => {
     const updated = produce(bullet, draft => {
       draft.state = (draft.state + 1) % 4;
@@ -31,44 +34,53 @@ export function View({ className, data, onUpdate, onEdit }: IProps) {
   const onClickOnBullet = (x: IBullet) => () => onEdit(x);
 
   //TODO: Move somewhere else
-  const groupedByDate = data.reduce((acc, current) => {
-    const date = parseISO(current.date);
-    const dayOfYear = getDayOfYear(date);
-    if (!acc.has(dayOfYear)) {
-      acc.set(dayOfYear, [current]);
-    } else {
-      const modified = produce(acc.get(dayOfYear), draft => {
-        draft.push(current);
-      });
-      acc.set(dayOfYear, modified);
-    }
-    return acc;
-  }, new Map<number, IBullet[]>());
+  const groupedByDate = Array.from(
+    data.reduce((acc, current) => {
+      const date = parseISO(current.date);
+      const dayOfYear = getDayOfYear(date);
+      if (!acc.has(dayOfYear)) {
+        acc.set(dayOfYear, [current]);
+      } else {
+        const modified = produce(acc.get(dayOfYear), draft => {
+          draft.push(current);
+        });
+        acc.set(dayOfYear, modified);
+      }
+      return acc;
+    }, new Map<number, IBullet[]>())
+  );
+
+  const prevPage = () => onChangePage(Math.min(groupedByDate.length, page + 1));
+  const nextPage = () => onChangePage(Math.max(0, page - 1));
 
   return (
-    <ul className={className}>
-      {Array.from(groupedByDate).map(([key, value], idx1) => (
-        <li key={idx1}>
-          <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
-          <ul>
-            {value.map((x, idx2) => (
-              <li key={idx2} className={`s-${x.state}`}>
-                <i onClick={cycle(x)}>
-                  {x.state === 0 && "•"}
-                  {x.state === 1 && "x"}
-                  {x.state === 2 && ">"}
-                  {x.state === 3 && "-"}
-                </i>
-                <h3
-                  onClick={onClickOnBullet(x)}
-                  dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
-                />
-              </li>
-            ))}
-          </ul>
-        </li>
-      ))}
-    </ul>
+    <>
+      <PrevPageButton onClick={prevPage} />
+      <NextPageButton onClick={nextPage} />
+      <ul className={className}>
+        {groupedByDate.map(([key, value], idx1) => (
+          <li key={idx1}>
+            <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
+            <ul>
+              {value.map((x, idx2) => (
+                <li key={idx2} className={`s-${x.state}`}>
+                  <i onClick={cycle(x)}>
+                    {x.state === 0 && "•"}
+                    {x.state === 1 && "x"}
+                    {x.state === 2 && ">"}
+                    {x.state === 3 && "-"}
+                  </i>
+                  <h3
+                    onClick={onClickOnBullet(x)}
+                    dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
+                  />
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 
