@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-export function AddButton({ onClick }: { onClick: VoidFunction }) {
+export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled: boolean }) {
   const View = styled.i`
     cursor: pointer;
     border: 1px solid red;
@@ -9,14 +9,16 @@ export function AddButton({ onClick }: { onClick: VoidFunction }) {
       "Open Sans", "Helvetica Neue", sans-serif;
     padding: 1em 1.2em;
     position: absolute;
+    user-select: none;
     bottom: 2em;
     right: 2em;
     border: 2px solid black;
     background-color: white;
+    opacity: ${enabled ? 1 : 0.2};
     &:hover {
       background-color: black;
       color: white;
     }
   `;
-  return <View onClick={onClick}>+</View>;
+  return <View onClick={enabled ? onClick : undefined}>+</View>;
 }

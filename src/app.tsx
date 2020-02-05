@@ -52,7 +52,7 @@ export function App() {
             )}
             {matches("journal.add") && <AddBullet onCommit={onAddCommit} onCancel={onAddCancel} />}
             <section>
-              <AddButton onClick={onClickOnAddButton} />
+              <AddButton enabled={!matches("journal.add")} onClick={onClickOnAddButton} />
               <Journal
                 data={context.journal}
                 page={context.page}

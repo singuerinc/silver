@@ -5,16 +5,15 @@ const View = styled.i.attrs((props: { direction: string }) => ({
   direction: props.direction
 }))`
   cursor: pointer;
-  border: 1px solid red;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Open Sans", "Helvetica Neue", sans-serif;
   padding: 1em 1.2em;
   position: absolute;
-  top: 2em;
+  top: 50%;
+  transform: translate(0, -50%);
   user-select: none;
   ${props => props.direction === "prev" && `left: 2em;`}
   ${props => props.direction === "next" && `right: 2em;`}
-  border: 2px solid black;
   background-color: white;
   &:hover {
     background-color: black;
