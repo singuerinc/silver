@@ -14,99 +14,142 @@ export type JournalEvent =
   | { type: "RESOLVE"; payload: IBullet[] }
   | { type: "ADD"; payload? }
   | { type: "EDIT_ONE"; payload: IBullet }
+  | { type: "DELETE_ONE"; payload: IBullet }
   | { type: "UPDATE_ONE"; payload: IBullet }
   | { type: "ERROR"; payload? }
   | { type: "SAVE_ONE"; payload? }
   | { type: "CANCEL"; payload? };
 
 const getJournal = () => Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
-const setJournal = ctx => Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
+const setJournal = ctx =>
+  Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
 const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
+const isTitleEmpty = (_, event) => {
+  debugger;
+  return event.payload.title === "";
+};
 
-export const machine = Machine<JournalContext, any, JournalEvent>({
-  strict: true,
-  context: {
-    current: null,
-    journal: []
-  },
-  initial: "welcome",
-  states: {
-    welcome: {
-      after: {
-        300: "loading"
-      }
-    },
-    loading: {
-      invoke: {
-        src: () => getJournal().then(res => res.sort(byDate)),
-        onDone: {
-          target: "journal",
-          actions: assign({ journal: (_, event) => event.data })
+const getJournalByDate = () => getJournal().then(res => res.sort(byDate));
+
+const saveOne = assign({
+  journal: (context: JournalContext, event: JournalEvent) =>
+    produce(context.journal, draft => {
+      draft.unshift(event.payload);
+    })
+});
+
+const updateOne = assign({
+  journal: (context: JournalContext, event: JournalEvent) =>
+    produce(context.journal, draft => {
+      const idx = draft.findIndex(item => item.id === event.payload.id);
+      draft[idx] = event.payload;
+    })
+});
+
+const deleteOne = assign({
+  journal: (context: JournalContext, event: JournalEvent) =>
+    produce(context.journal, draft => {
+      draft.reduce((acc, item) => {
+        if (item.id !== event.payload.id) {
+          acc.push(item);
         }
-      }
+        return acc;
+      }, []);
+    })
+});
+
+const setCurrent = assign({
+  current: (_, event: JournalEvent) => event.payload
+});
+
+const assignJournal = assign({ journal: (_, event) => event.data });
+
+export const machine = Machine<JournalContext, any, JournalEvent>(
+  {
+    strict: true,
+    context: {
+      current: null,
+      journal: []
     },
-    failure: {},
-    journal: {
-      initial: "default",
-      states: {
-        default: {
-          on: {
-            ADD: "add",
-            EDIT_ONE: "edit",
-            UPDATE_ONE: "update" /* state update */
+    initial: "welcome",
+    states: {
+      welcome: {
+        after: {
+          300: "loading"
+        }
+      },
+      loading: {
+        invoke: {
+          src: "getJournalByDate",
+          onDone: {
+            target: "journal",
+            actions: "assignJournal"
           }
-        },
-        add: {
-          on: {
-            CANCEL: "default",
-            SAVE_ONE: {
-              actions: [
-                assign({
-                  journal: (context, event) =>
-                    produce(context.journal, draft => {
-                      draft.unshift(event.payload);
-                    })
-                })
-              ],
-              target: "save"
+        }
+      },
+      failure: {},
+      journal: {
+        initial: "default",
+        states: {
+          default: {
+            on: {
+              ADD: "add",
+              EDIT_ONE: "edit",
+              UPDATE_ONE: "update" /* state update */,
+              DELETE_ONE: "delete"
             }
-          }
-        },
-        edit: {
-          entry: [
-            assign({
-              current: (_, event) => event.payload
-            })
-          ],
-          on: {
-            CANCEL: "default",
-            UPDATE_ONE: "update" /* title update */
-          }
-        },
-        update: {
-          entry: [
-            assign({
-              journal: ({ journal }, { payload }) =>
-                produce(journal, draft => {
-                  //TODO!: delete bullet if no title!
-                  const idx = draft.findIndex(item => item.id === payload.id);
-                  draft[idx] = payload;
-                })
-            })
-          ],
-          on: {
-            "": "save"
-          }
-        },
-        save: {
-          invoke: {
-            src: setJournal,
-            onDone: {
-              target: "default"
+          },
+          add: {
+            on: {
+              CANCEL: "default",
+              SAVE_ONE: {
+                actions: "saveOne",
+                target: "saveJournal"
+              }
+            }
+          },
+          edit: {
+            entry: ["setCurrent"],
+            on: {
+              CANCEL: "default",
+              UPDATE_ONE: "update" /* title update */
+            }
+          },
+          update: {
+            entry: ["updateOne"],
+            on: {
+              "": [{ target: "saveJournal" }]
+            }
+          },
+          delete: {
+            entry: ["deleteOne"],
+            on: {
+              "": "saveJournal"
+            }
+          },
+          saveJournal: {
+            invoke: {
+              src: "setJournal",
+              onDone: {
+                target: "default"
+              }
             }
           }
         }
       }
     }
+  },
+  {
+    actions: {
+      setCurrent,
+      saveOne,
+      deleteOne,
+      updateOne,
+      assignJournal
+    },
+    services: {
+      getJournalByDate,
+      setJournal
+    }
   }
-});
+);
