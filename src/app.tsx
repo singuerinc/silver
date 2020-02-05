@@ -36,8 +36,7 @@ export function App() {
 
   return (
     (
-      <div>
-        {context.page}
+      <>
         {matches("welcome") && <Welcome />}
         {matches("loading") && <Loading />}
         {matches("failure") && <Failure />}
@@ -68,7 +67,7 @@ export function App() {
             )}
           </>
         )}
-      </div>
+      </>
     ) || null
   );
 }

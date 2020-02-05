@@ -74,7 +74,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
     states: {
       welcome: {
         after: {
-          300: "loading"
+          500: "loading"
         }
       },
       loading: {

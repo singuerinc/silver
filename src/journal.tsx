@@ -52,35 +52,39 @@ export function View({ className, data, page, onChangePage, onUpdate, onEdit }: 
     }, new Map<number, IBullet[]>())
   );
 
-  const prevPage = () => onChangePage(Math.min(groupedByDate.length, page + 1));
+  const firstPage = page === 0;
+  const lastPage = page === groupedByDate.length - 1;
+  const prevPage = () => onChangePage(Math.min(groupedByDate.length - 1, page + 1));
   const nextPage = () => onChangePage(Math.max(0, page - 1));
+
+  const [key, value] = groupedByDate[page];
 
   return (
     <>
-      <PrevPageButton onClick={prevPage} />
-      <NextPageButton onClick={nextPage} />
+      <PrevPageButton enabled={!lastPage} onClick={prevPage} />
+      <NextPageButton enabled={!firstPage} onClick={nextPage} />
       <ul className={className}>
-        {groupedByDate.map(([key, value], idx1) => (
-          <li key={idx1}>
-            <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
-            <ul>
-              {value.map((x, idx2) => (
-                <li key={idx2} className={`s-${x.state}`}>
-                  <i onClick={cycle(x)}>
-                    {x.state === 0 && "•"}
-                    {x.state === 1 && "x"}
-                    {x.state === 2 && ">"}
-                    {x.state === 3 && "-"}
-                  </i>
-                  <h3
-                    onClick={onClickOnBullet(x)}
-                    dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
-                  />
-                </li>
-              ))}
-            </ul>
-          </li>
-        ))}
+        {/* {groupedByDate.map(([key, value], idx1) => ( */}
+        <li key={0}>
+          <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
+          <ul>
+            {value.map((x, idx2) => (
+              <li key={idx2} className={`s-${x.state}`}>
+                <i onClick={cycle(x)}>
+                  {x.state === 0 && "•"}
+                  {x.state === 1 && "x"}
+                  {x.state === 2 && ">"}
+                  {x.state === 3 && "-"}
+                </i>
+                <h3
+                  onClick={onClickOnBullet(x)}
+                  dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
+                />
+              </li>
+            ))}
+          </ul>
+        </li>
+        {/* ))} */}
       </ul>
     </>
   );
@@ -117,13 +121,15 @@ export const Journal = styled(View)`
           flex: 0 0 auto;
           min-width: 1em;
           font-size: 1.4em;
-          > a[data-hook="user"] {
+          > a[data-hook="slackUser"] {
             color: red;
           }
           > a[data-hook="tag"] {
             color: blue;
           }
-          > a[data-hook="link"],
+          > a[data-hook="link"] {
+            color: orange;
+          }
           > a[data-hook="jira"] {
             color: green;
           }

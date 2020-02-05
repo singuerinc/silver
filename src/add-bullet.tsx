@@ -28,7 +28,7 @@ const getStateAndTitle = (original: string) => {
 function View({ className, onCommit, onCancel }: IProps) {
   const ref = useRef<HTMLInputElement>(null);
 
-  function onKeyDown(e: KeyboardEvent) {
+  const onKeyDown = (e: KeyboardEvent) => {
     e.stopImmediatePropagation();
 
     if (e.keyCode === 13) {
@@ -48,14 +48,18 @@ function View({ className, onCommit, onCancel }: IProps) {
       // escape
       onCancel();
     }
-  }
+  };
+
+  const onBlur = () => onCancel();
 
   useEffect(() => {
     ref.current?.focus();
     // listen for enter+esc keys
+    ref.current?.addEventListener("blur", onBlur);
     window.addEventListener("keydown", onKeyDown, true);
 
     return () => {
+      ref.current?.removeEventListener("blur", onBlur);
       window.removeEventListener("keydown", onKeyDown, true);
     };
   }, []);

@@ -3,7 +3,6 @@ import styled from "styled-components";
 
 export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled: boolean }) {
   const View = styled.i`
-    cursor: pointer;
     border: 1px solid red;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
       "Open Sans", "Helvetica Neue", sans-serif;
@@ -14,11 +13,22 @@ export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled
     right: 2em;
     border: 2px solid black;
     background-color: white;
-    opacity: ${enabled ? 1 : 0.2};
-    &:hover {
-      background-color: black;
-      color: white;
+    opacity: 0.2;
+    pointer-events: none;
+    &[data-enabled="true"] {
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+      pointer-events: all;
+      opacity: 1;
+      cursor: pointer;
+      &:hover {
+        background-color: black;
+        color: white;
+      }
     }
   `;
-  return <View onClick={enabled ? onClick : undefined}>+</View>;
+  return (
+    <View data-enabled={enabled} onClick={onClick}>
+      +
+    </View>
+  );
 }
