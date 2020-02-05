@@ -24,11 +24,7 @@ const getJournal = () => Promise.resolve(JSON.parse(localStorage.getItem("journa
 const setJournal = ctx =>
   Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
 const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
-const isTitleEmpty = (_, event) => {
-  debugger;
-  return event.payload.title === "";
-};
-
+const isTitleEmpty = (_, event) => event.payload.title === "";
 const getJournalByDate = () => getJournal().then(res => res.sort(byDate));
 
 const saveOne = assign({
@@ -49,7 +45,7 @@ const updateOne = assign({
 const deleteOne = assign({
   journal: (context: JournalContext, event: JournalEvent) =>
     produce(context.journal, draft => {
-      draft.reduce((acc, item) => {
+      return draft.reduce((acc, item) => {
         if (item.id !== event.payload.id) {
           acc.push(item);
         }
@@ -112,13 +108,13 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
             entry: ["setCurrent"],
             on: {
               CANCEL: "default",
-              UPDATE_ONE: "update" /* title update */
+              UPDATE_ONE: [{ target: "delete", cond: "isTitleEmpty" }, { target: "update" }]
             }
           },
           update: {
             entry: ["updateOne"],
             on: {
-              "": [{ target: "saveJournal" }]
+              "": "saveJournal"
             }
           },
           delete: {
@@ -145,11 +141,15 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
       saveOne,
       deleteOne,
       updateOne,
-      assignJournal
+      assignJournal,
+      isTitleEmpty
     },
     services: {
       getJournalByDate,
       setJournal
+    },
+    guards: {
+      isTitleEmpty
     }
   }
 );

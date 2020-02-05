@@ -59,7 +59,10 @@ export function View({ className, data, onUpdate, onEdit }: IProps) {
                   {x.state === 2 && ">"}
                   {x.state === 3 && "-"}
                 </i>
-                <h3 onClick={onClickOnBullet(x)} dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }} />
+                <h3
+                  onClick={onClickOnBullet(x)}
+                  dangerouslySetInnerHTML={{ __html: applyHooks(x.title) }}
+                />
               </li>
             ))}
           </ul>
@@ -98,6 +101,7 @@ export const Journal = styled(View)`
         > h3 {
           user-select: none;
           flex: 0 0 auto;
+          min-width: 1em;
           font-size: 1.4em;
           > a[data-hook="user"] {
             color: red;
