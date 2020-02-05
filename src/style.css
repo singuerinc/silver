@@ -18,16 +18,22 @@ body {
 }
 
 #app {
-  margin: 2em 0;
-  padding: 2em;
   flex: 1 1;
   width: 100%;
   max-width: 44.6em;
+  max-height: 64.1em;
   background-image: url(./dot.svg);
   background-size: 24px;
   border: 2em solid white;
   background-color: white;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+}
+
+@media screen and (min-width: 32em) {
+  #app {
+    margin: 2em 0;
+    padding: 2em;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  }
 }
 
 img {
