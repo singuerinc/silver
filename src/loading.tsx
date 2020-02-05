@@ -2,7 +2,7 @@ import * as React from "react";
 import cloud_download from "./icons/cloud_download-24px.svg";
 import styled from "styled-components";
 
-function View({ className }) {
+function View({ className }: { className?: string }) {
   return (
     <div className={className}>
       <img src={cloud_download} />

@@ -2,7 +2,7 @@ import * as React from "react";
 import list from "./icons/list-24px.svg";
 import styled from "styled-components";
 
-function View({ className }) {
+function View({ className }: { className?: string }) {
   return (
     <div className={className}>
       <img src={list} />

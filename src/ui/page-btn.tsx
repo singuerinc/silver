@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-const View = styled.i.attrs(props => ({
+const View = styled.i.attrs((props: { direction: string }) => ({
   direction: props.direction
 }))`
   cursor: pointer;
@@ -21,7 +21,7 @@ const View = styled.i.attrs(props => ({
   }
 `;
 
-export function PrevPageButton({ onClick }) {
+export function PrevPageButton({ onClick }: { onClick: VoidFunction }) {
   return (
     <View direction="prev" onClick={onClick}>
       &lt;
@@ -29,7 +29,7 @@ export function PrevPageButton({ onClick }) {
   );
 }
 
-export function NextPageButton({ onClick }) {
+export function NextPageButton({ onClick }: { onClick: VoidFunction }) {
   return (
     <View direction="next" onClick={onClick}>
       &gt;

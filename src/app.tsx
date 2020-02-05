@@ -9,13 +9,12 @@ import { IBullet } from "./IBullet";
 import sync from "./icons/sync-24px.svg";
 import { Journal } from "./journal";
 import { Loading } from "./loading";
-import { machine } from "./machine";
+import { JournalContext, machine, JournalEvent } from "./machine";
 import { AddButton } from "./ui/add-btn";
-import { NextPageButton, PrevPageButton } from "./ui/page-btn";
 import { Welcome } from "./welcome";
 
-function View({ className }) {
-  const [current, send] = useMachine(machine);
+export function App() {
+  const [current, send] = useMachine<JournalContext, JournalEvent>(machine);
   const { context, matches } = current;
 
   const onUpdateInJournal = (payload: IBullet) => send({ type: "UPDATE_ONE", payload });
@@ -26,7 +25,7 @@ function View({ className }) {
   const onAddCancel = () => send("CANCEL");
   const onChangePage = (page: number) => send({ type: "CHANGE_PAGE", payload: page });
   const onClickOnAddButton = () => send("ADD");
-  const onKeyDown = e => e.code === "Period" && send("ADD");
+  const onKeyDown = (e: KeyboardEvent) => e.code === "Period" && send("ADD");
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
@@ -37,14 +36,14 @@ function View({ className }) {
 
   return (
     (
-      <div className={className}>
+      <div>
         {context.page}
         {matches("welcome") && <Welcome />}
         {matches("loading") && <Loading />}
         {matches("failure") && <Failure />}
         {matches("journal") && (
           <>
-            {matches("journal.edit") && (
+            {matches("journal.edit") && context.current && (
               <EditBullet
                 bullet={context.current}
                 onCancel={onEditCancel}
@@ -73,5 +72,3 @@ function View({ className }) {
     ) || null
   );
 }
-
-export const App = styled(View)``;

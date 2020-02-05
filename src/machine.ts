@@ -4,29 +4,29 @@ import produce from "immer";
 import { assign, Machine } from "xstate";
 import { IBullet } from "./IBullet";
 
-interface JournalContext {
-  current: IBullet;
+export interface JournalContext {
+  current: IBullet | null;
   journal: IBullet[];
   page: number;
 }
 
 export type JournalEvent =
-  | { type: "FETCH"; payload? }
+  | { type: "FETCH" }
   | { type: "RESOLVE"; payload: IBullet[] }
-  | { type: "ADD"; payload? }
+  | { type: "ADD" }
   | { type: "EDIT_ONE"; payload: IBullet }
   | { type: "DELETE_ONE"; payload: IBullet }
   | { type: "UPDATE_ONE"; payload: IBullet }
-  | { type: "ERROR"; payload? }
+  | { type: "ERROR" }
   | { type: "CHANGE_PAGE"; payload: number }
-  | { type: "SAVE_ONE"; payload? }
-  | { type: "CANCEL"; payload? };
+  | { type: "SAVE_ONE"; payload: IBullet }
+  | { type: "CANCEL" };
 
-const getJournal = () => Promise.resolve(JSON.parse(localStorage.getItem("journal")) || []);
-const setJournal = ctx =>
+const getJournal = () => Promise.resolve(JSON.parse(localStorage.getItem("journal") ?? "[]") || []);
+const setJournal = (ctx: JournalContext) =>
   Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
 const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
-const isTitleEmpty = (_, event) => event.payload.title === "";
+const isTitleEmpty = (ctx: JournalContext) => ctx.current?.title === "";
 const getJournalByDate = () => getJournal().then(res => res.sort(byDate));
 
 const saveOne = assign({
@@ -115,7 +115,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
             }
           },
           edit: {
-            entry: ["setCurrent"],
+            entry: ["assignCurrent"],
             on: {
               CANCEL: "default",
               UPDATE_ONE: [{ target: "delete", cond: "isTitleEmpty" }, { target: "update" }]

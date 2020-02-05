@@ -10,30 +10,29 @@ interface IProps {
   onCancel: VoidFunction;
 }
 
-const states = {
-  "": 0,
-  ".": 0,
-  x: 1,
-  ">": 2,
-  "-": 3
-};
+const states = new Map<string, number>([
+  [".", 0],
+  ["x", 1],
+  [">", 2],
+  ["-", 3]
+]);
 
 const getStateAndTitle = (original: string) => {
   const rEx = /^([.|>|\-|x]{1})/gim;
   const symbol = rEx.exec(original)?.[0] ?? "";
-  const state = states[symbol];
+  const state = states.get(symbol) ?? 0;
   const title = original.replace(rEx, "");
   return { state, title };
 };
 
 function View({ className, onCommit, onCancel }: IProps) {
-  const ref = useRef(null);
+  const ref = useRef<HTMLInputElement>(null);
 
   function onKeyDown(e: KeyboardEvent) {
     e.stopImmediatePropagation();
 
     if (e.keyCode === 13) {
-      const { title, state } = getStateAndTitle(ref.current.value);
+      const { title, state } = getStateAndTitle(ref.current?.value ?? "");
       // enter
       const bullet: IBullet = {
         id: uuidv4(),
@@ -42,7 +41,7 @@ function View({ className, onCommit, onCancel }: IProps) {
         state
       };
 
-      ref.current.value = "";
+      ref.current && (ref.current.value = "");
 
       onCommit(bullet);
     } else if (e.keyCode === 27) {
@@ -52,7 +51,7 @@ function View({ className, onCommit, onCancel }: IProps) {
   }
 
   useEffect(() => {
-    ref.current.focus();
+    ref.current?.focus();
     // listen for enter+esc keys
     window.addEventListener("keydown", onKeyDown, true);
 

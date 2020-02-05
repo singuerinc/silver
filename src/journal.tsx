@@ -2,7 +2,7 @@ import format from "date-fns/format";
 import getDayOfYear from "date-fns/getDayOfYear";
 import parseISO from "date-fns/parseISO";
 import setDayOfYear from "date-fns/setDayOfYear";
-import produce from "immer";
+import produce, { Draft } from "immer";
 import * as React from "react";
 import styled from "styled-components";
 import { IBullet } from "./IBullet";
@@ -16,12 +16,13 @@ interface IProps {
   data: IBullet[];
   page: number;
   className?: string;
-  onUpdate(x: IBullet): VoidFunction;
-  onChangePage(page: number): VoidFunction;
-  onEdit(x: IBullet): VoidFunction;
+  onUpdate: (x: IBullet) => void;
+  onChangePage: (page: number) => void;
+  onEdit: (x: IBullet) => void;
 }
 
-const applyHooks = title => [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
+const applyHooks = (title: string) =>
+  [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
 
 export function View({ className, data, page, onChangePage, onUpdate, onEdit }: IProps) {
   const cycle = (bullet: IBullet) => () => {
@@ -41,8 +42,9 @@ export function View({ className, data, page, onChangePage, onUpdate, onEdit }: 
       if (!acc.has(dayOfYear)) {
         acc.set(dayOfYear, [current]);
       } else {
-        const modified = produce(acc.get(dayOfYear), draft => {
+        const modified = produce(acc.get(dayOfYear), (draft: Draft<IBullet[]>) => {
           draft.push(current);
+          return draft;
         });
         acc.set(dayOfYear, modified);
       }

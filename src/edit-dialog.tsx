@@ -12,10 +12,10 @@ interface IProps {
 }
 
 function View({ className, bullet, onCommit, onCancel }: IProps) {
-  const ref = useRef(null);
-  const win = useRef(null);
+  const ref = useRef<HTMLInputElement>(null);
+  const win = useRef<HTMLDivElement>(null);
 
-  function onKeyDown(e) {
+  function onKeyDown(e: KeyboardEvent) {
     if (e.keyCode === 13) {
       // enter
       const input = e.target as HTMLInputElement;
@@ -34,18 +34,18 @@ function View({ className, bullet, onCommit, onCancel }: IProps) {
   };
 
   useEffect(() => {
-    ref.current.focus();
+    ref.current?.focus();
     // listen for enter+esc keys
     window.addEventListener("keydown", onKeyDown);
     // clicks outside this dialog should close it
     window.addEventListener("click", onCancel);
     // do not close if we click inside
-    win.current.addEventListener("click", stopPropagation);
+    win.current?.addEventListener("click", stopPropagation);
 
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("click", onCancel);
-      win.current.removeEventListener("click", stopPropagation);
+      win.current?.removeEventListener("click", stopPropagation);
     };
   }, []);
 

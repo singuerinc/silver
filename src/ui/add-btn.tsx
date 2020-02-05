@@ -1,7 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
 
-export function AddButton({ onClick }) {
+export function AddButton({ onClick }: { onClick: VoidFunction }) {
   const View = styled.i`
     cursor: pointer;
     border: 1px solid red;
