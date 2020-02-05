@@ -22,11 +22,12 @@ body {
   flex: 1 1;
   width: 100%;
   max-width: 44.6em;
-  max-height: 64.1em;
+  max-height: minmax(90%, 64.1em);
   background-image: url(./dot.svg);
   background-size: 24px;
   border: 2em solid white;
   background-color: white;
+  overflow-y: scroll;
 }
 
 @media screen and (min-width: 32em) {

@@ -11,6 +11,7 @@ import { Journal } from "./journal";
 import { Loading } from "./loading";
 import { machine } from "./machine";
 import { Welcome } from "./welcome";
+import { AddButton } from "./ui/add-btn";
 
 function View({ className }) {
   const [current, send] = useMachine(machine);
@@ -23,12 +24,7 @@ function View({ className }) {
   const onEditCancel = () => send("CANCEL");
   const onAddCancel = () => send("CANCEL");
   const onClickOnAddButton = () => send("ADD");
-
-  function onKeyDown(e) {
-    if (e.code === "Period") {
-      send("ADD");
-    }
-  }
+  const onKeyDown = e => e.code === "Period" && send("ADD");
 
   useEffect(() => {
     window.addEventListener("keydown", onKeyDown);
@@ -50,9 +46,7 @@ function View({ className }) {
             )}
             {matches("journal.add") && <AddBullet onCommit={onAddCommit} onCancel={onAddCancel} />}
             <section>
-              <i className="add-btn" onClick={onClickOnAddButton}>
-                +
-              </i>
+              <AddButton onClick={onClickOnAddButton} />
               <Journal data={context.journal} onEdit={onEditInJournal} onUpdate={onUpdateInJournal} />
             </section>
             {matches("journal.save") && (
@@ -67,16 +61,4 @@ function View({ className }) {
   );
 }
 
-export const App = styled(View)`
-  > section > i.add-btn {
-    border: 1px solid red;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
-      "Helvetica Neue", sans-serif;
-    padding: 1em 1.2em;
-    position: absolute;
-    bottom: 2em;
-    right: 2em;
-    border: 2px solid black;
-    background-color: white;
-  }
-`;
+export const App = styled(View)``;
