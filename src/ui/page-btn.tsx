@@ -10,9 +10,10 @@ const View = styled.i.attrs((props: { direction: string }) => ({
     "Open Sans", "Helvetica Neue", sans-serif;
   padding: 1em 1.2em;
   position: absolute;
-  top: 0;
-  ${props => props.direction === "prev" && `left: 0;`}
-  ${props => props.direction === "next" && `right: 0;`}
+  top: 2em;
+  user-select: none;
+  ${props => props.direction === "prev" && `left: 2em;`}
+  ${props => props.direction === "next" && `right: 2em;`}
   border: 2px solid black;
   background-color: white;
   &:hover {
