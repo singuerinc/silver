@@ -35,9 +35,10 @@ function View({ className, onCommit, onCancel }: IProps) {
       const { title, state } = getStateAndTitle(ref.current?.value ?? "");
       // enter
       const bullet: IBullet = {
+        version: "1.0.0",
         id: uuidv4(),
         title,
-        date: new Date().toISOString(),
+        created: new Date().toISOString(),
         state
       };
 

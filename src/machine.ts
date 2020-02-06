@@ -33,7 +33,7 @@ const getJournal = () => {
 };
 const setJournal = (ctx: JournalContext) =>
   Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
-const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
+const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.created), parseISO(b.created));
 const isTitleEmpty = (ctx: JournalContext) => ctx.current?.title === "";
 const getJournalByDate = () => getJournal().then(res => res.sort(byDate));
 

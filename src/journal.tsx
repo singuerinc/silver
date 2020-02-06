@@ -1,3 +1,4 @@
+import compareAsc from "date-fns/compareAsc";
 import format from "date-fns/format";
 import getDayOfYear from "date-fns/getDayOfYear";
 import parseISO from "date-fns/parseISO";
@@ -5,14 +6,14 @@ import setDayOfYear from "date-fns/setDayOfYear";
 import produce, { Draft } from "immer";
 import * as React from "react";
 import styled from "styled-components";
-import { IBullet } from "./IBullet";
 import { jira } from "./hooks/jira";
 import { link } from "./hooks/link";
 import { slack } from "./hooks/slack";
 import { tag } from "./hooks/tag";
-import { PrevPageButton, NextPageButton } from "./ui/page-btn";
-import { useTheme } from "./useTheme";
+import { IBullet } from "./IBullet";
 import { Theme } from "./theme";
+import { NextPageButton, PrevPageButton } from "./ui/page-btn";
+import { useTheme } from "./useTheme";
 
 interface IProps {
   data: IBullet[];
@@ -23,6 +24,8 @@ interface IProps {
   onEdit: (x: IBullet) => void;
 }
 
+const oldestFirst = (a: IBullet, b: IBullet) =>
+  compareAsc(parseISO(a.created), parseISO(b.created));
 const applyHooks = (title: string) =>
   [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
 
@@ -40,13 +43,14 @@ export function Journal({ data, page, onChangePage, onUpdate, onEdit }: IProps) 
   //TODO: Move somewhere else
   const groupedByDate = Array.from(
     data.reduce((acc, current) => {
-      const date = parseISO(current.date);
-      const dayOfYear = getDayOfYear(date);
+      const created = parseISO(current.created);
+      const dayOfYear = getDayOfYear(created);
       if (!acc.has(dayOfYear)) {
         acc.set(dayOfYear, [current]);
       } else {
         const modified = produce(acc.get(dayOfYear), (draft: Draft<IBullet[]>) => {
           draft.push(current);
+          draft.sort(oldestFirst);
           return draft;
         });
         acc.set(dayOfYear, modified);

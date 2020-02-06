@@ -49,7 +49,6 @@ export function App() {
                 onCommit={onEditCommit}
               />
             )}
-            {matches("journal.add") && <AddBullet onCommit={onAddCommit} onCancel={onAddCancel} />}
             <section>
               <AddButton enabled={!matches("journal.add")} onClick={onClickOnAddButton} />
               <Journal
@@ -60,6 +59,7 @@ export function App() {
                 onUpdate={onUpdateInJournal}
               />
             </section>
+            {matches("journal.add") && <AddBullet onCommit={onAddCommit} onCancel={onAddCancel} />}
             {matches("journal.save") && (
               <i>
                 <img src={sync} />
