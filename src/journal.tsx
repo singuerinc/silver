@@ -97,6 +97,7 @@ export function Journal({ data, page, onChangePage, onUpdate, onEdit }: IProps) 
 
 const Wrapper = styled.ul`
   list-style: none;
+  position: relative;
   > li {
     display: flex;
     flex-flow: column;

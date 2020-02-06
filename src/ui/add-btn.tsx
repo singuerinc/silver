@@ -10,6 +10,7 @@ export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled
       "Open Sans", "Helvetica Neue", sans-serif;
     padding: 1em 1.2em;
     position: absolute;
+    z-index: 2;
     user-select: none;
     bottom: 2em;
     right: 2em;
