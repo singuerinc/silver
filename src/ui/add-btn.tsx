@@ -1,9 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useTheme } from "../useTheme";
+import { ColorType } from "../theme";
 
 export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled: boolean }) {
+  const theme = useTheme();
   const View = styled.i`
-    border: 1px solid red;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
       "Open Sans", "Helvetica Neue", sans-serif;
     padding: 1em 1.2em;
@@ -11,8 +13,9 @@ export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled
     user-select: none;
     bottom: 2em;
     right: 2em;
-    border: 2px solid black;
-    background-color: white;
+    color: ${theme.color("primary", 0)};
+    border: 2px solid ${theme.color("primary", 0)};
+    background-color: ${theme.color("secondary", 0)};
     opacity: 0.2;
     pointer-events: none;
     &[data-enabled="true"] {
@@ -21,8 +24,9 @@ export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled
       opacity: 1;
       cursor: pointer;
       &:hover {
-        background-color: black;
-        color: white;
+        color: ${theme.color("secondary", 0)};
+        border: 2px solid ${theme.color("secondary", 0)};
+        background-color: ${theme.color("primary", 0)};
       }
     }
   `;

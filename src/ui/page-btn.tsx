@@ -1,8 +1,11 @@
 import * as React from "react";
 import styled from "styled-components";
+import { useTheme } from "../useTheme";
+import { Theme } from "../theme";
 
-const View = styled.i.attrs((props: { direction: string }) => ({
-  direction: props.direction
+const View = styled.i.attrs(({ direction, theme }: { direction: string; theme: Theme }) => ({
+  direction,
+  theme
 }))`
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell,
     "Open Sans", "Helvetica Neue", sans-serif;
@@ -13,8 +16,9 @@ const View = styled.i.attrs((props: { direction: string }) => ({
   user-select: none;
   ${props => props.direction === "prev" && `left: 2em;`}
   ${props => props.direction === "next" && `right: 2em;`}
-  background-color: white;
-  border: 2px solid black;
+  color: ${props => props.theme.color("primary", 0)};
+  border: 2px solid ${props => props.theme.color("primary", 0)};
+  background-color: ${props => props.theme.color("secondary", 0)};
   opacity: 0.2;
   pointer-events: none;
   &[data-enabled="true"] {
@@ -23,15 +27,16 @@ const View = styled.i.attrs((props: { direction: string }) => ({
     opacity: 1;
     cursor: pointer;
     &:hover {
-      background-color: black;
-      color: white;
+      color: ${props => props.theme.color("secondary", 0)};
+      border: 2px solid ${props => props.theme.color("secondary", 0)};
+      background-color: ${props => props.theme.color("primary", 0)};
     }
   }
 `;
 
 export function PrevPageButton({ onClick, enabled }: { onClick: VoidFunction; enabled: boolean }) {
   return (
-    <View data-enabled={enabled} direction="prev" onClick={onClick}>
+    <View theme={useTheme()} data-enabled={enabled} direction="prev" onClick={onClick}>
       &lt;
     </View>
   );
@@ -39,7 +44,7 @@ export function PrevPageButton({ onClick, enabled }: { onClick: VoidFunction; en
 
 export function NextPageButton({ onClick, enabled }: { onClick: VoidFunction; enabled: boolean }) {
   return (
-    <View data-enabled={enabled} direction="next" onClick={onClick}>
+    <View theme={useTheme()} data-enabled={enabled} direction="next" onClick={onClick}>
       &gt;
     </View>
   );

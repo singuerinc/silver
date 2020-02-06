@@ -11,11 +11,13 @@ import { link } from "./hooks/link";
 import { slack } from "./hooks/slack";
 import { tag } from "./hooks/tag";
 import { PrevPageButton, NextPageButton } from "./ui/page-btn";
+import { useTheme } from "./useTheme";
+import { Theme } from "./theme";
 
 interface IProps {
   data: IBullet[];
   page: number;
-  className?: string;
+  theme?: Theme;
   onUpdate: (x: IBullet) => void;
   onChangePage: (page: number) => void;
   onEdit: (x: IBullet) => void;
@@ -24,7 +26,8 @@ interface IProps {
 const applyHooks = (title: string) =>
   [jira, tag, link, slack].reduce((acc, hook) => hook(acc), title);
 
-export function View({ className, data, page, onChangePage, onUpdate, onEdit }: IProps) {
+export function Journal({ data, page, onChangePage, onUpdate, onEdit }: IProps) {
+  const theme = useTheme();
   const cycle = (bullet: IBullet) => () => {
     const updated = produce(bullet, draft => {
       draft.state = (draft.state + 1) % 4;
@@ -63,8 +66,7 @@ export function View({ className, data, page, onChangePage, onUpdate, onEdit }: 
     <>
       <PrevPageButton enabled={!lastPage} onClick={prevPage} />
       <NextPageButton enabled={!firstPage} onClick={nextPage} />
-      <ul className={className}>
-        {/* {groupedByDate.map(([key, value], idx1) => ( */}
+      <Wrapper theme={theme}>
         <li key={0}>
           <h2>{format(setDayOfYear(new Date(), key), "M.d EEE")}</h2>
           <ul>
@@ -84,18 +86,18 @@ export function View({ className, data, page, onChangePage, onUpdate, onEdit }: 
             ))}
           </ul>
         </li>
-        {/* ))} */}
-      </ul>
+      </Wrapper>
     </>
   );
 }
 
-export const Journal = styled(View)`
+const Wrapper = styled.ul`
   list-style: none;
   > li {
     display: flex;
     flex-flow: column;
     > h2 /* date */ {
+      color: ${props => props.theme.color("primary", 0)};
       margin: 0 0 0.5em 0;
       user-select: none;
       font-size: 2.1em;
@@ -105,6 +107,7 @@ export const Journal = styled(View)`
       > li {
         display: flex;
         > i {
+          color: ${props => props.theme.color("primary", 0)};
           cursor: pointer;
           flex: 0 0 1em;
           margin-right: 0.1em;
@@ -117,6 +120,7 @@ export const Journal = styled(View)`
           }
         }
         > h3 {
+          color: ${props => props.theme.color("primary", 0)};
           user-select: none;
           flex: 0 0 auto;
           min-width: 1em;
