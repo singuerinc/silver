@@ -34,7 +34,7 @@ body {
   #app {
     margin: 2em 0;
     padding: 2em;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 0 15px 9px rgba(0, 0, 0, 0.05);
   }
 }
 
