@@ -23,8 +23,14 @@ export type JournalEvent =
   | { type: "SAVE_ONE"; payload: IBullet }
   | { type: "CANCEL" };
 
-const getJournal = () =>
-  Promise.resolve(JSON.parse(localStorage.getItem("journal") ?? "[]") || fallback);
+const getJournal = () => {
+  let data = fallback;
+  try {
+    const storage = localStorage.getItem("journal");
+    data = JSON.parse(storage ?? "");
+  } catch {}
+  return Promise.resolve(data);
+};
 const setJournal = (ctx: JournalContext) =>
   Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
 const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
