@@ -16,9 +16,9 @@ const View = styled.i.attrs(({ direction, theme }: { direction: string; theme: T
   user-select: none;
   ${props => props.direction === "prev" && `left: 2em;`}
   ${props => props.direction === "next" && `right: 2em;`}
-  color: ${props => props.theme.color("primary", 0)};
-  border: 2px solid ${props => props.theme.color("primary", 0)};
-  background-color: ${props => props.theme.color("secondary", 0)};
+  color: ${props => props.theme.color("gray", 9)};
+  border: 2px solid ${props => props.theme.color("gray", 9)};
+  background-color: ${props => props.theme.color("indigo", 0)};
   opacity: 0.2;
   pointer-events: none;
   &[data-enabled="true"] {
@@ -27,9 +27,9 @@ const View = styled.i.attrs(({ direction, theme }: { direction: string; theme: T
     opacity: 1;
     cursor: pointer;
     &:hover {
-      color: ${props => props.theme.color("secondary", 0)};
-      border: 2px solid ${props => props.theme.color("secondary", 0)};
-      background-color: ${props => props.theme.color("primary", 0)};
+      color: ${props => props.theme.color("indigo", 0)};
+      border: 2px solid ${props => props.theme.color("indigo", 0)};
+      background-color: ${props => props.theme.color("gray", 9)};
     }
   }
 `;

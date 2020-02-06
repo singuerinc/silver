@@ -1,8 +1,7 @@
+import * as OpenColor from "open-color";
+
 export const theme = {
-  colors: {
-    primary: ["black"],
-    secondary: ["white"]
-  }
+  colors: OpenColor.default
 };
 
 export type Theme = typeof theme;

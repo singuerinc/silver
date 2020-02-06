@@ -13,9 +13,9 @@ export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled
     user-select: none;
     bottom: 2em;
     right: 2em;
-    color: ${theme.color("primary", 0)};
-    border: 2px solid ${theme.color("primary", 0)};
-    background-color: ${theme.color("secondary", 0)};
+    color: ${theme.color("gray", 9)};
+    border: 2px solid ${theme.color("gray", 9)};
+    background-color: ${theme.color("indigo", 0)};
     opacity: 0.2;
     pointer-events: none;
     &[data-enabled="true"] {
@@ -24,9 +24,9 @@ export function AddButton({ onClick, enabled }: { onClick: VoidFunction; enabled
       opacity: 1;
       cursor: pointer;
       &:hover {
-        color: ${theme.color("secondary", 0)};
-        border: 2px solid ${theme.color("secondary", 0)};
-        background-color: ${theme.color("primary", 0)};
+        color: ${theme.color("indigo", 0)};
+        border: 2px solid ${theme.color("indigo", 0)};
+        background-color: ${theme.color("gray", 9)};
       }
     }
   `;

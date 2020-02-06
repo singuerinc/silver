@@ -97,7 +97,7 @@ const Wrapper = styled.ul`
     display: flex;
     flex-flow: column;
     > h2 /* date */ {
-      color: ${props => props.theme.color("primary", 0)};
+      color: ${props => props.theme.color("gray", 9)};
       margin: 0 0 0.5em 0;
       user-select: none;
       font-size: 2.1em;
@@ -107,7 +107,7 @@ const Wrapper = styled.ul`
       > li {
         display: flex;
         > i {
-          color: ${props => props.theme.color("primary", 0)};
+          color: ${props => props.theme.color("gray", 9)};
           cursor: pointer;
           flex: 0 0 1em;
           margin-right: 0.1em;
@@ -120,7 +120,7 @@ const Wrapper = styled.ul`
           }
         }
         > h3 {
-          color: ${props => props.theme.color("primary", 0)};
+          color: ${props => props.theme.color("gray", 9)};
           user-select: none;
           flex: 0 0 auto;
           min-width: 1em;
