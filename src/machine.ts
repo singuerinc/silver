@@ -3,6 +3,7 @@ import parseISO from "date-fns/parseISO";
 import produce from "immer";
 import { assign, Machine } from "xstate";
 import { IBullet } from "./IBullet";
+import { fallback } from "./data";
 
 export interface JournalContext {
   current: IBullet | null;
@@ -22,7 +23,8 @@ export type JournalEvent =
   | { type: "SAVE_ONE"; payload: IBullet }
   | { type: "CANCEL" };
 
-const getJournal = () => Promise.resolve(JSON.parse(localStorage.getItem("journal") ?? "[]") || []);
+const getJournal = () =>
+  Promise.resolve(JSON.parse(localStorage.getItem("journal") ?? "[]") || fallback);
 const setJournal = (ctx: JournalContext) =>
   Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
 const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.date), parseISO(b.date));
