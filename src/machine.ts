@@ -12,15 +12,15 @@ export interface JournalContext {
 }
 
 export type JournalEvent =
-  | { type: "FETCH" }
   | { type: "RESOLVE"; payload: IBullet[] }
-  | { type: "ADD" }
   | { type: "EDIT_ONE"; payload: IBullet }
   | { type: "DELETE_ONE"; payload: IBullet }
   | { type: "UPDATE_ONE"; payload: IBullet }
   | { type: "ERROR" }
   | { type: "CHANGE_PAGE"; payload: number }
   | { type: "SAVE_ONE"; payload: IBullet }
+  | { type: "FETCH" }
+  | { type: "ADD" }
   | { type: "CANCEL" };
 
 const getJournal = () => {
@@ -33,8 +33,10 @@ const getJournal = () => {
 };
 const setJournal = (ctx: JournalContext) =>
   Promise.resolve(localStorage.setItem("journal", JSON.stringify(ctx.journal)));
-const byDate = (a: IBullet, b: IBullet) => compareDesc(parseISO(a.created), parseISO(b.created));
-const isTitleEmpty = (ctx: JournalContext) => ctx.current?.title === "";
+const byDate = (a: IBullet, b: IBullet) =>
+  compareDesc(parseISO(a.created), parseISO(b.created));
+const isTitleEmpty = (_: JournalContext, event: JournalEvent) =>
+  event.payload.title === "";
 const getJournalByDate = () => getJournal().then(res => res.sort(byDate));
 
 const saveOne = assign({
@@ -82,7 +84,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
     states: {
       welcome: {
         after: {
-          2500: "loading"
+          200: "loading"
         }
       },
       loading: {
@@ -126,7 +128,10 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
             entry: ["assignCurrent"],
             on: {
               CANCEL: "default",
-              UPDATE_ONE: [{ target: "delete", cond: "isTitleEmpty" }, { target: "update" }]
+              UPDATE_ONE: [
+                { target: "delete", cond: "isTitleEmpty" },
+                { target: "update" }
+              ]
             }
           },
           update: {
@@ -160,8 +165,7 @@ export const machine = Machine<JournalContext, any, JournalEvent>(
       saveOne,
       deleteOne,
       updateOne,
-      assignJournal,
-      isTitleEmpty
+      assignJournal
     },
     services: {
       getJournalByDate,

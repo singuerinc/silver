@@ -1,4 +1,6 @@
-* {
+*,
+*:before,
+*:after {
   box-sizing: border-box;
 }
 
@@ -15,7 +17,7 @@ body {
   flex-flow: column;
   align-items: center;
   justify-content: center;
-  font-family: "Caveat", cursive;
+  font: 1em "Caveat", cursive;
 }
 
 #app {
@@ -32,7 +34,11 @@ body {
 
 #app:after {
   content: "";
-  background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+  background: linear-gradient(
+    0deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
   height: 7em;
   width: 100%;
   position: absolute;

@@ -59,6 +59,7 @@ function View({ className, bullet, onCommit, onCancel }: IProps) {
 
 export const EditBullet = styled(View)`
   position: absolute;
+  z-index: 1;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
